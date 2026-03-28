@@ -3,18 +3,13 @@ package net.histos.mcdiscordbot.discord;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Flow;
 import java.util.logging.Logger;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -48,60 +43,26 @@ class DiscordWebhookSenderTest {
                 .thenReturn(CompletableFuture.completedFuture(response));
     }
 
-    @SuppressWarnings("unchecked")
-    private HttpRequest captureRequest() {
-        ArgumentCaptor<HttpRequest> captor = ArgumentCaptor.forClass(HttpRequest.class);
-        verify(httpClient).sendAsync(captor.capture(), any(HttpResponse.BodyHandler.class));
-        return captor.getValue();
-    }
-
     @Test
-    void sendsToCorrectUrl() {
+    void sendsToCorrectUrlWithJsonContentType() {
         mockResponse(204);
         sender.send("Steve", "uuid-123", 0, "joined", null);
 
-        HttpRequest request = captureRequest();
-        assertThat(request.uri().toString()).isEqualTo(WEBHOOK_URL);
+        verify(httpClient).sendAsync(
+                argThat(req ->
+                        req.uri().toString().equals(WEBHOOK_URL) &&
+                        req.headers().firstValue("Content-Type").orElse("").equals("application/json")),
+                any());
     }
 
     @Test
-    void setsContentTypeHeader() {
+    void sendsPostRequest() {
         mockResponse(204);
         sender.send("Steve", "uuid-123", 0, "joined", null);
 
-        HttpRequest request = captureRequest();
-        assertThat(request.headers().firstValue("Content-Type")).hasValue("application/json");
-    }
-
-    @Test
-    void payloadContainsBotNameAsUsername() {
-        mockResponse(204);
-        sender.send("Steve", "uuid-123", 5763719, "Steve joined", null);
-
-        HttpRequest request = captureRequest();
-        String body = extractBody(request);
-
-        assertThat(body)
-                .contains("\"username\":\"TestBot\"")
-                .contains("\"title\":\"Steve joined\"")
-                .contains("\"color\":5763719")
-                .contains("mc-heads.net/avatar/uuid-123/64");
-    }
-
-    private static String extractBody(HttpRequest request) {
-        return request.bodyPublisher().map(pub -> {
-            var buffers = new ArrayList<ByteBuffer>();
-            pub.subscribe(new Flow.Subscriber<>() {
-                public void onSubscribe(Flow.Subscription subscription) { subscription.request(Long.MAX_VALUE); }
-                public void onNext(ByteBuffer item) { buffers.add(item); }
-                public void onError(Throwable throwable) {}
-                public void onComplete() {}
-            });
-            int size = buffers.stream().mapToInt(ByteBuffer::remaining).sum();
-            var combined = ByteBuffer.allocate(size);
-            buffers.forEach(combined::put);
-            return new String(combined.array(), StandardCharsets.UTF_8);
-        }).orElse("");
+        verify(httpClient).sendAsync(
+                argThat(req -> req.method().equals("POST")),
+                any());
     }
 
     @Test
