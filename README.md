@@ -60,3 +60,15 @@ colors:
 ```
 
 All messages appear from the configured bot identity. Each embed includes the player's Minecraft skin as a thumbnail.
+
+## Testing
+
+```bash
+./gradlew test
+```
+
+To bypass the cache and force tests to re-run:
+
+```bash
+./gradlew cleanTest test
+```

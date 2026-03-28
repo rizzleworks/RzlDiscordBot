@@ -15,4 +15,4 @@ _(Well-defined features ready for development)_
 _(Ideas and exploration — not yet fully scoped)_
 
 - **Custom Bukkit event support**: Allow config-driven listeners for arbitrary Bukkit events from other plugins (e.g., land claims, economy transactions). Design: map event class names to webhook message templates.
-- **Automated testing strategy**: Determine approach for unit/integration tests (mock Bukkit API, webhook endpoint stubbing, etc.)
+- **Event listener tests**: Add MockBukkit to test `PlayerEventListener` with mock players and events
