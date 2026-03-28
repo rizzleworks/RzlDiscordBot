@@ -22,4 +22,11 @@ jobs:
 
       - run: ./gradlew test --no-daemon
 
+      - uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: Test Results
+          path: build/test-results/test/*.xml
+          reporter: java-junit
+
       - run: ./gradlew shadowJar --no-daemon
