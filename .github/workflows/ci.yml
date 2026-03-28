@@ -20,6 +20,6 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
-      - run: ./gradlew test
+      - run: ./gradlew test --no-daemon
 
-      - run: ./gradlew shadowJar
+      - run: ./gradlew shadowJar --no-daemon
