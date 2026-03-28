@@ -1,0 +1,5 @@
+name: McDiscordBot
+version: '1.0.0'
+main: net.histos.mcdiscordbot.McDiscordBotPlugin
+description: Posts player events to Discord via webhooks
+api-version: '1.21'
