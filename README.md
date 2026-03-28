@@ -1,5 +1,7 @@
 # McDiscordBot
 
+![CI](https://github.com/cliffmeyers/minecraft-discord-bot/actions/workflows/ci.yml/badge.svg)
+
 A Paper plugin that posts Minecraft server events to a Discord channel via webhooks. Player joins, leaves, deaths, and advancements show up as rich embeds with player skin avatars.
 
 ## Features
@@ -60,3 +62,15 @@ colors:
 ```
 
 All messages appear from the configured bot identity. Each embed includes the player's Minecraft skin as a thumbnail.
+
+## Testing
+
+```bash
+./gradlew test
+```
+
+To bypass the cache and force tests to re-run:
+
+```bash
+./gradlew cleanTest test
+```

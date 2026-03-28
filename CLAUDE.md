@@ -30,4 +30,8 @@ Single Paper plugin, no external services or runtime dependencies beyond the JDK
 
 ## Testing
 
-No automated tests yet. Testing strategy TBD — manual testing against a local Paper server for now.
+```bash
+./gradlew test
+```
+
+JUnit 5 + Mockito. Tests cover the `discord` package: `JsonUtil`, `Embed`, `WebhookPayload` (pure unit tests), and `DiscordWebhookSender` (mocked `HttpClient`). Event listeners are not yet tested (would need MockBukkit).
