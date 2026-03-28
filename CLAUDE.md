@@ -27,6 +27,8 @@ Single Paper plugin, no external services or runtime dependencies beyond the JDK
 - **Thread safety**: Only use pre-extracted strings (no Bukkit API calls) inside async webhook sends.
 - **Advancement filtering**: `getAdvancement().getDisplay() == null` filters out recipe unlocks and hidden advancements.
 - **Rate limits**: Discord webhooks allow 30 requests/60 seconds per URL.
+- **Delayed join messages**: `onPlayerJoin` uses `runTaskLater(plugin, task, 20L)` (1-second delay) because `getFirstPlayed()` and `getStatistic(PLAY_ONE_MINUTE)` can return 0 if read immediately during `PlayerJoinEvent`. Always check `player.isOnline()` before sending — the player may disconnect during the delay.
+- **PLAY_ONE_MINUTE**: Despite the name, this Bukkit statistic counts **ticks**, not minutes. Divide by 1200 for minutes (20 ticks/sec × 60 sec).
 
 ## Testing
 
