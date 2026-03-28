@@ -17,32 +17,31 @@ public class DiscordWebhookSender {
     private final HttpClient httpClient;
     private final String webhookUrl;
     private final String botName;
+    private final String botIconUrl;
     private final Logger logger;
 
-    public DiscordWebhookSender(HttpClient httpClient, String webhookUrl, String botName, Logger logger) {
+    public DiscordWebhookSender(HttpClient httpClient, String webhookUrl, String botName, String botIconUrl, Logger logger) {
         this.httpClient = httpClient;
         this.webhookUrl = webhookUrl;
         this.botName = botName;
+        this.botIconUrl = botIconUrl != null ? botIconUrl : "";
         this.logger = logger;
     }
 
     public void send(String playerName, String playerUuid, int color, String title, String description) {
-        String avatarUrl = AVATAR_URL_TEMPLATE.formatted(playerUuid);
+        String skinUrl = AVATAR_URL_TEMPLATE.formatted(playerUuid);
 
-        String embedJson = new EmbedBuilder()
+        var embed = new Embed()
                 .title(title)
                 .description(description)
                 .color(color)
-                .thumbnailUrl(avatarUrl)
-                .toJson();
+                .thumbnailUrl(skinUrl);
 
-        String payload = """
-                {"username":"%s","avatar_url":"%s","embeds":[%s]}"""
-                .formatted(
-                        EmbedBuilder.escape(playerName),
-                        EmbedBuilder.escape(avatarUrl),
-                        embedJson
-                );
+        var payload = new WebhookPayload()
+                .username(botName)
+                .avatarUrl(botIconUrl)
+                .addEmbed(embed)
+                .toJson();
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(webhookUrl))

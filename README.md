@@ -44,6 +44,7 @@ The webhook URL is the only credential needed. Treat it like a secret — anyone
 ```yaml
 webhook-url: "https://discord.com/api/webhooks/..."
 bot-name: "Minecraft Server"
+bot-icon-url: ""  # Optional — falls back to Discord's default webhook avatar
 
 events:
   player-join: true
@@ -58,4 +59,4 @@ colors:
   advancement: 15844367  # Gold
 ```
 
-Each message appears in Discord with the player's Minecraft skin as the avatar and their name as the sender.
+All messages appear from the configured bot identity. Each embed includes the player's Minecraft skin as a thumbnail.
