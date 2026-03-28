@@ -26,7 +26,7 @@ jobs:
         if: always()
         with:
           name: Test Results
-          path: build/test-results/test/*.xml
+          path: '**/test-results/test/TEST-*.xml'
           reporter: java-junit
 
       - run: ./gradlew shadowJar --no-daemon
