@@ -26,7 +26,7 @@ public class McDiscordBotPlugin extends JavaPlugin {
         String botIconUrl = getConfig().getString("bot-icon-url", "");
 
         var webhookSender = new DiscordWebhookSender(httpClient, webhookUrl, botName, botIconUrl, getLogger());
-        var listener = new PlayerEventListener(webhookSender, getConfig());
+        var listener = new PlayerEventListener(this, webhookSender, getConfig());
 
         getServer().getPluginManager().registerEvents(listener, this);
         getLogger().info("McDiscordBot enabled — posting events to Discord.");

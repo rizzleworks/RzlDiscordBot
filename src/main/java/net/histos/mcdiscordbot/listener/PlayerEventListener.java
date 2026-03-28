@@ -2,6 +2,7 @@ package net.histos.mcdiscordbot.listener;
 
 import net.histos.mcdiscordbot.discord.DiscordWebhookSender;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import org.bukkit.Statistic;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -9,13 +10,19 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.plugin.Plugin;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class PlayerEventListener implements Listener {
 
+    private final Plugin plugin;
     private final DiscordWebhookSender webhookSender;
     private final FileConfiguration config;
 
-    public PlayerEventListener(DiscordWebhookSender webhookSender, FileConfiguration config) {
+    public PlayerEventListener(Plugin plugin, DiscordWebhookSender webhookSender, FileConfiguration config) {
+        this.plugin = plugin;
         this.webhookSender = webhookSender;
         this.config = config;
     }
@@ -25,15 +32,24 @@ public class PlayerEventListener implements Listener {
         if (!config.getBoolean("events.player-join", true)) return;
 
         var player = event.getPlayer();
+        String playerName = player.getName();
+        String playerUuid = player.getUniqueId().toString();
         int color = config.getInt("colors.join", 5763719);
 
-        webhookSender.send(
-                player.getName(),
-                player.getUniqueId().toString(),
-                color,
-                player.getName() + " joined the server",
-                null
-        );
+        // Delay stat reading by 1 second (20 ticks) — stats may return 0 if read
+        // immediately during PlayerJoinEvent because player data isn't fully loaded yet.
+        plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+            if (!player.isOnline()) return;
+
+            String firstPlayed = new SimpleDateFormat("MMM d, yyyy").format(new Date(player.getFirstPlayed()));
+            int playTimeTicks = player.getStatistic(Statistic.PLAY_ONE_MINUTE);
+            long totalMinutes = playTimeTicks / 1200L;
+            long hours = totalMinutes / 60;
+            long minutes = totalMinutes % 60;
+            String description = "First joined: " + firstPlayed + " \u2022 Play time: " + hours + "h " + minutes + "m";
+
+            webhookSender.send(playerName, playerUuid, color, playerName + " joined the server", description);
+        }, 20L);
     }
 
     @EventHandler
