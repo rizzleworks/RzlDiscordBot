@@ -23,8 +23,9 @@ public class McDiscordBotPlugin extends JavaPlugin {
 
         httpClient = HttpClient.newHttpClient();
         String botName = getConfig().getString("bot-name", "Minecraft Server");
+        String botIconUrl = getConfig().getString("bot-icon-url", "");
 
-        var webhookSender = new DiscordWebhookSender(httpClient, webhookUrl, botName, getLogger());
+        var webhookSender = new DiscordWebhookSender(httpClient, webhookUrl, botName, botIconUrl, getLogger());
         var listener = new PlayerEventListener(webhookSender, getConfig());
 
         getServer().getPluginManager().registerEvents(listener, this);

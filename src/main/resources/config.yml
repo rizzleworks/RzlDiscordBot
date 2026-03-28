@@ -2,8 +2,12 @@
 # Create one in Discord: Channel Settings > Integrations > Webhooks > New Webhook
 webhook-url: ""
 
-# Default bot display name (used when no player-specific name applies)
+# Bot display name shown as the webhook sender in Discord
 bot-name: "Minecraft Server"
+
+# Bot icon URL shown as the webhook sender avatar (optional)
+# If blank or unreachable, Discord falls back to the webhook's default avatar
+bot-icon-url: ""
 
 # Toggle individual event types
 events:
