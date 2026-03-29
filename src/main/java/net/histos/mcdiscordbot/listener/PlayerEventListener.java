@@ -81,12 +81,15 @@ public class PlayerEventListener implements Listener {
             deathMessage = PlainTextComponentSerializer.plainText().serialize(deathComponent);
         }
 
+        var loc = player.getLocation();
+        String coordinates = "at %d, %d, %d".formatted(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+
         webhookSender.send(
                 player.getName(),
                 player.getUniqueId().toString(),
                 color,
                 deathMessage,
-                null
+                coordinates
         );
     }
 
