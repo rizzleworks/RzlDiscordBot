@@ -16,6 +16,7 @@ _(Well-defined features ready for development)_
 - **Mute via server command**: an admin player logged into the server can mute Discord messages via a slash command.
 - **Mute via config change**: change a value in the config file that will mute any messages from the server. Ideally this doesn't require a server restart. Can the plugin periodically scan for config changes and pick them up? We want to be careful about how much of the config it would try to re-read as major config changes could put the plugin into a bad state.
 - **Throttling Strategy**: ensure that repeated joins and quits from the same player don't spam the server.
+- **CI Discord notifications**: GitHub Actions workflow that posts to the Discord webhook when a PR is merged (PR title, author, link). Use `curl` + the same webhook URL stored as a repo secret.
 
 ## Much Later
 
