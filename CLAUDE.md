@@ -1,4 +1,4 @@
-# McDiscordBot
+# RzlDiscordBot
 
 Paper 1.21.11 plugin that posts player events to Discord via webhooks.
 
@@ -6,10 +6,10 @@ Paper 1.21.11 plugin that posts player events to Discord via webhooks.
 
 ```bash
 ./gradlew shadowJar
-cp build/libs/discord-bot-1.0.0.jar /path/to/paper-server/plugins/
+cp build/libs/RzlDiscordBot-1.0.0.jar /path/to/paper-server/plugins/
 ```
 
-Config is generated at `plugins/McDiscordBot/config.yml` on first server start. The webhook URL must be set there.
+Config is generated at `plugins/RzlDiscordBot/config.yml` on first server start. The webhook URL must be set there.
 
 ## Architecture
 

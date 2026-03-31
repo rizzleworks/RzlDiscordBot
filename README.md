@@ -1,4 +1,4 @@
-# McDiscordBot
+# RzlDiscordBot
 
 ![CI](https://github.com/cliffmeyers/minecraft-discord-bot/actions/workflows/ci.yml/badge.svg)
 
@@ -23,12 +23,12 @@ A Paper plugin that posts Minecraft server events to a Discord channel via webho
 ./gradlew shadowJar
 ```
 
-Produces `build/libs/discord-bot-1.0.0.jar`.
+Produces `build/libs/RzlDiscordBot-1.0.0.jar`.
 
 ## Installation
 
 1. Copy the JAR to your Paper server's `plugins/` directory.
-2. Start the server. The plugin generates `plugins/McDiscordBot/config.yml` and logs a warning that no webhook URL is configured.
+2. Start the server. The plugin generates `plugins/RzlDiscordBot/config.yml` and logs a warning that no webhook URL is configured.
 3. Set up a Discord webhook (see below) and paste the URL into `config.yml`.
 4. Restart the server.
 
@@ -37,7 +37,7 @@ Produces `build/libs/discord-bot-1.0.0.jar`.
 1. Open your Discord server and go to the channel where you want events posted.
 2. **Channel Settings > Integrations > Webhooks > New Webhook**.
 3. Copy the webhook URL — it looks like `https://discord.com/api/webhooks/1234567890/abcDEF_ghiJKL...`
-4. Paste it into `plugins/McDiscordBot/config.yml` as the `webhook-url` value.
+4. Paste it into `plugins/RzlDiscordBot/config.yml` as the `webhook-url` value.
 
 The webhook URL is the only credential needed. Treat it like a secret — anyone with the URL can post to that channel.
 

@@ -1,4 +1,4 @@
-package net.histos.mcdiscordbot.discord;
+package com.rizzleworks.discordbot.discord;
 
 /**
  * Builder for a Discord embed object.

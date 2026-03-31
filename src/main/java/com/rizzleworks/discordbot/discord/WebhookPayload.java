@@ -1,4 +1,4 @@
-package net.histos.mcdiscordbot.discord;
+package com.rizzleworks.discordbot.discord;
 
 import java.util.ArrayList;
 import java.util.List;

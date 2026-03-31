@@ -1,4 +1,4 @@
-# McDiscordBot — TODO
+# RzlDiscordBot — TODO
 
 ## Soon
 
