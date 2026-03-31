@@ -1,6 +1,6 @@
-package net.histos.mcdiscordbot.listener;
+package com.rizzleworks.discordbot.listener;
 
-import net.histos.mcdiscordbot.discord.DiscordWebhookSender;
+import com.rizzleworks.discordbot.discord.DiscordWebhookSender;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Statistic;
 import org.bukkit.configuration.file.FileConfiguration;

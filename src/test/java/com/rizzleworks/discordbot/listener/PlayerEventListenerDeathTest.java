@@ -1,6 +1,6 @@
-package net.histos.mcdiscordbot.listener;
+package com.rizzleworks.discordbot.listener;
 
-import net.histos.mcdiscordbot.discord.DiscordWebhookSender;
+import com.rizzleworks.discordbot.discord.DiscordWebhookSender;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.World;

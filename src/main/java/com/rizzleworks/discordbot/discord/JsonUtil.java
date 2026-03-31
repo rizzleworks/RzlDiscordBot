@@ -1,4 +1,4 @@
-package net.histos.mcdiscordbot.discord;
+package com.rizzleworks.discordbot.discord;
 
 /**
  * Shared JSON string escaping utility.

@@ -1,4 +1,4 @@
-package net.histos.mcdiscordbot.discord;
+package com.rizzleworks.discordbot.discord;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
