@@ -1,47 +1,19 @@
 package com.rizzleworks.discordbot.command;
 
+import com.mojang.brigadier.Command;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.context.CommandContext;
 import com.rizzleworks.discordbot.NotificationEvent;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
+import io.papermc.paper.command.brigadier.Commands;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-import java.util.List;
-
-public class RzlDiscordCommand implements CommandExecutor, TabCompleter {
+public class RzlDiscordCommand {
 
     public static final String COMMAND_NAME = "rzldiscord";
-
-    private enum Subcommand {
-        TOGGLE("toggle"),
-        STATUS("status"),
-        RELOAD("reload");
-
-        private static final List<String> NAMES =
-                Arrays.stream(values()).map(Subcommand::label).toList();
-
-        private final String label;
-
-        Subcommand(String label) {
-            this.label = label;
-        }
-
-        String label() {
-            return label;
-        }
-
-        static Subcommand fromLabel(String label) {
-            for (Subcommand sub : values()) {
-                if (sub.label.equals(label)) return sub;
-            }
-            return null;
-        }
-    }
+    public static final String PERMISSION = "rzldiscordbot.admin";
 
     private final JavaPlugin plugin;
 
@@ -49,45 +21,38 @@ public class RzlDiscordCommand implements CommandExecutor, TabCompleter {
         this.plugin = plugin;
     }
 
-    @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command,
-                             @NotNull String label, @NotNull String[] args) {
-        if (args.length == 0) {
-            sendUsage(sender);
-            return true;
-        }
+    public void register(Commands commands) {
+        var command = Commands.literal(COMMAND_NAME)
+                .requires(source -> source.getSender().hasPermission(PERMISSION))
+                .then(Commands.literal("toggle")
+                        .then(Commands.argument("event", StringArgumentType.word())
+                                .suggests((context, builder) -> {
+                                    for (String name : NotificationEvent.SHORT_NAMES) {
+                                        builder.suggest(name);
+                                    }
+                                    return builder.buildFuture();
+                                })
+                                .executes(this::handleToggle)))
+                .then(Commands.literal("status")
+                        .executes(this::handleStatus))
+                .then(Commands.literal("reload")
+                        .executes(this::handleReload))
+                .build();
 
-        Subcommand subcommand = Subcommand.fromLabel(args[0].toLowerCase());
-        if (subcommand == null) {
-            sendUsage(sender);
-            return true;
-        }
-
-        return switch (subcommand) {
-            case TOGGLE -> handleToggle(sender, args);
-            case STATUS -> handleStatus(sender);
-            case RELOAD -> handleReload(sender);
-        };
+        commands.register(command, "Manage RzlDiscordBot event toggles");
     }
 
-    private void sendUsage(CommandSender sender) {
-        String subcommands = String.join("|", Subcommand.NAMES);
-        sender.sendMessage(Component.text("Usage: /" + COMMAND_NAME + " <" + subcommands + ">", NamedTextColor.YELLOW));
-    }
+    @SuppressWarnings("UnstableApiUsage")
+    private int handleToggle(CommandContext<CommandSourceStack> ctx) {
+        var sender = ctx.getSource().getSender();
+        String eventName = StringArgumentType.getString(ctx, "event");
 
-    private boolean handleToggle(CommandSender sender, String[] args) {
-        if (args.length < 2) {
-            sender.sendMessage(Component.text(
-                    "Usage: /" + COMMAND_NAME + " " + Subcommand.TOGGLE.label() + " <" + String.join("|", NotificationEvent.SHORT_NAMES) + ">",
-                    NamedTextColor.YELLOW));
-            return true;
-        }
-
-        String eventName = args[1].toLowerCase();
         NotificationEvent notificationEvent = NotificationEvent.fromShortName(eventName);
         if (notificationEvent == null) {
-            sender.sendMessage(Component.text("Unknown event: " + eventName + ". Options: " + String.join(", ", NotificationEvent.SHORT_NAMES), NamedTextColor.RED));
-            return true;
+            sender.sendMessage(Component.text(
+                    "Unknown event: " + eventName + ". Options: " + String.join(", ", NotificationEvent.SHORT_NAMES),
+                    NamedTextColor.RED));
+            return Command.SINGLE_SUCCESS;
         }
 
         boolean current = plugin.getConfig().getBoolean(notificationEvent.toggleKey(), true);
@@ -96,11 +61,15 @@ public class RzlDiscordCommand implements CommandExecutor, TabCompleter {
         plugin.saveConfig();
 
         String state = updated ? "enabled" : "disabled";
-        sender.sendMessage(Component.text(eventName + " notifications " + state, updated ? NamedTextColor.GREEN : NamedTextColor.RED));
-        return true;
+        sender.sendMessage(Component.text(
+                eventName + " notifications " + state,
+                updated ? NamedTextColor.GREEN : NamedTextColor.RED));
+        return Command.SINGLE_SUCCESS;
     }
 
-    private boolean handleStatus(CommandSender sender) {
+    @SuppressWarnings("UnstableApiUsage")
+    private int handleStatus(CommandContext<CommandSourceStack> ctx) {
+        var sender = ctx.getSource().getSender();
         sender.sendMessage(Component.text("--- RzlDiscordBot Event Status ---", NamedTextColor.GOLD));
         for (NotificationEvent event : NotificationEvent.values()) {
             boolean enabled = plugin.getConfig().getBoolean(event.toggleKey(), true);
@@ -108,28 +77,13 @@ public class RzlDiscordCommand implements CommandExecutor, TabCompleter {
             String state = enabled ? "enabled" : "disabled";
             sender.sendMessage(Component.text("  " + event.shortName() + ": " + state, color));
         }
-        return true;
+        return Command.SINGLE_SUCCESS;
     }
 
-    private boolean handleReload(CommandSender sender) {
+    @SuppressWarnings("UnstableApiUsage")
+    private int handleReload(CommandContext<CommandSourceStack> ctx) {
         plugin.reloadConfig();
-        sender.sendMessage(Component.text("Configuration reloaded.", NamedTextColor.GREEN));
-        return true;
-    }
-
-    @Override
-    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command,
-                                      @NotNull String label, @NotNull String[] args) {
-        if (args.length == 1) {
-            return Subcommand.NAMES.stream()
-                    .filter(s -> s.startsWith(args[0].toLowerCase()))
-                    .toList();
-        }
-        if (args.length == 2 && args[0].equalsIgnoreCase(Subcommand.TOGGLE.label())) {
-            return NotificationEvent.SHORT_NAMES.stream()
-                    .filter(s -> s.startsWith(args[1].toLowerCase()))
-                    .toList();
-        }
-        return List.of();
+        ctx.getSource().getSender().sendMessage(Component.text("Configuration reloaded.", NamedTextColor.GREEN));
+        return Command.SINGLE_SUCCESS;
     }
 }

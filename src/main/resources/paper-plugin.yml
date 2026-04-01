@@ -3,14 +3,3 @@ version: '1.0.0'
 main: com.rizzleworks.discordbot.RzlDiscordBotPlugin
 description: Posts player events to Discord via webhooks
 api-version: '1.21'
-
-commands:
-  rzldiscord:
-    description: Manage RzlDiscordBot event toggles
-    usage: /rzldiscord <toggle|status|reload>
-    permission: rzldiscordbot.admin
-
-permissions:
-  rzldiscordbot.admin:
-    description: Allows managing RzlDiscordBot settings
-    default: op

@@ -3,6 +3,7 @@ package com.rizzleworks.discordbot;
 import com.rizzleworks.discordbot.command.RzlDiscordCommand;
 import com.rizzleworks.discordbot.discord.DiscordWebhookSender;
 import com.rizzleworks.discordbot.listener.PlayerEventListener;
+import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.net.http.HttpClient;
@@ -15,12 +16,9 @@ public class RzlDiscordBotPlugin extends JavaPlugin {
     public void onEnable() {
         saveDefaultConfig();
 
-        var rzlCommand = getCommand(RzlDiscordCommand.COMMAND_NAME);
-        if (rzlCommand != null) {
-            var executor = new RzlDiscordCommand(this);
-            rzlCommand.setExecutor(executor);
-            rzlCommand.setTabCompleter(executor);
-        }
+        var rzlCommand = new RzlDiscordCommand(this);
+        getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS,
+                event -> rzlCommand.register(event.registrar()));
 
         String webhookUrl = getConfig().getString("webhook-url", "");
         if (webhookUrl == null || webhookUrl.isBlank()) {
