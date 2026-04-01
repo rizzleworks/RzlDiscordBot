@@ -1,5 +1,6 @@
 package com.rizzleworks.discordbot.listener;
 
+import com.rizzleworks.discordbot.NotificationEvent;
 import com.rizzleworks.discordbot.discord.DiscordWebhookSender;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
@@ -31,13 +32,14 @@ class PlayerEventListenerDeathTest {
 
     @BeforeEach
     void setUp() {
-        listener = new PlayerEventListener(plugin, webhookSender, config);
+        when(plugin.getConfig()).thenReturn(config);
+        listener = new PlayerEventListener(plugin, webhookSender);
     }
 
     @Test
     void deathSendsMessageWithCoordinates() {
-        when(config.getBoolean("events.player-death", true)).thenReturn(true);
-        when(config.getInt("colors.death", 2303786)).thenReturn(2303786);
+        when(config.getBoolean(NotificationEvent.DEATH.toggleKey(), true)).thenReturn(true);
+        when(config.getInt(NotificationEvent.DEATH.colorKey(), NotificationEvent.DEATH.defaultColor())).thenReturn(2303786);
         when(event.getEntity()).thenReturn(player);
         when(player.getName()).thenReturn("Steve");
         when(player.getUniqueId()).thenReturn(java.util.UUID.fromString("00000000-0000-0000-0000-000000000001"));
@@ -57,8 +59,8 @@ class PlayerEventListenerDeathTest {
 
     @Test
     void deathWithNullComponentUsesFallbackMessage() {
-        when(config.getBoolean("events.player-death", true)).thenReturn(true);
-        when(config.getInt("colors.death", 2303786)).thenReturn(2303786);
+        when(config.getBoolean(NotificationEvent.DEATH.toggleKey(), true)).thenReturn(true);
+        when(config.getInt(NotificationEvent.DEATH.colorKey(), NotificationEvent.DEATH.defaultColor())).thenReturn(2303786);
         when(event.getEntity()).thenReturn(player);
         when(player.getName()).thenReturn("Steve");
         when(player.getUniqueId()).thenReturn(java.util.UUID.fromString("00000000-0000-0000-0000-000000000001"));
@@ -78,7 +80,7 @@ class PlayerEventListenerDeathTest {
 
     @Test
     void deathDisabledDoesNotSend() {
-        when(config.getBoolean("events.player-death", true)).thenReturn(false);
+        when(config.getBoolean(NotificationEvent.DEATH.toggleKey(), true)).thenReturn(false);
 
         listener.onPlayerDeath(event);
 

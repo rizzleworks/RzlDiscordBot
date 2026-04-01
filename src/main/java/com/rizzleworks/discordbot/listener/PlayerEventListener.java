@@ -1,9 +1,9 @@
 package com.rizzleworks.discordbot.listener;
 
+import com.rizzleworks.discordbot.NotificationEvent;
 import com.rizzleworks.discordbot.discord.DiscordWebhookSender;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Statistic;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -19,22 +19,20 @@ public class PlayerEventListener implements Listener {
 
     private final Plugin plugin;
     private final DiscordWebhookSender webhookSender;
-    private final FileConfiguration config;
 
-    public PlayerEventListener(Plugin plugin, DiscordWebhookSender webhookSender, FileConfiguration config) {
+    public PlayerEventListener(Plugin plugin, DiscordWebhookSender webhookSender) {
         this.plugin = plugin;
         this.webhookSender = webhookSender;
-        this.config = config;
     }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
-        if (!config.getBoolean("events.player-join", true)) return;
+        if (!plugin.getConfig().getBoolean(NotificationEvent.JOIN.toggleKey(), true)) return;
 
         var player = event.getPlayer();
         String playerName = player.getName();
         String playerUuid = player.getUniqueId().toString();
-        int color = config.getInt("colors.join", 5763719);
+        int color = plugin.getConfig().getInt(NotificationEvent.JOIN.colorKey(), NotificationEvent.JOIN.defaultColor());
 
         // Delay stat reading by 1 second (20 ticks) — stats may return 0 if read
         // immediately during PlayerJoinEvent because player data isn't fully loaded yet.
@@ -54,10 +52,10 @@ public class PlayerEventListener implements Listener {
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
-        if (!config.getBoolean("events.player-leave", true)) return;
+        if (!plugin.getConfig().getBoolean(NotificationEvent.LEAVE.toggleKey(), true)) return;
 
         var player = event.getPlayer();
-        int color = config.getInt("colors.leave", 15548997);
+        int color = plugin.getConfig().getInt(NotificationEvent.LEAVE.colorKey(), NotificationEvent.LEAVE.defaultColor());
 
         webhookSender.send(
                 player.getName(),
@@ -70,10 +68,10 @@ public class PlayerEventListener implements Listener {
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
-        if (!config.getBoolean("events.player-death", true)) return;
+        if (!plugin.getConfig().getBoolean(NotificationEvent.DEATH.toggleKey(), true)) return;
 
         var player = event.getEntity();
-        int color = config.getInt("colors.death", 2303786);
+        int color = plugin.getConfig().getInt(NotificationEvent.DEATH.colorKey(), NotificationEvent.DEATH.defaultColor());
 
         String deathMessage = player.getName() + " died";
         var deathComponent = event.deathMessage();
@@ -95,14 +93,14 @@ public class PlayerEventListener implements Listener {
 
     @EventHandler
     public void onPlayerAdvancement(PlayerAdvancementDoneEvent event) {
-        if (!config.getBoolean("events.player-advancement", true)) return;
+        if (!plugin.getConfig().getBoolean(NotificationEvent.ADVANCEMENT.toggleKey(), true)) return;
 
         // Filter out recipe unlocks and hidden advancements
         var display = event.getAdvancement().getDisplay();
         if (display == null) return;
 
         var player = event.getPlayer();
-        int color = config.getInt("colors.advancement", 15844367);
+        int color = plugin.getConfig().getInt(NotificationEvent.ADVANCEMENT.colorKey(), NotificationEvent.ADVANCEMENT.defaultColor());
 
         String advancementTitle = PlainTextComponentSerializer.plainText().serialize(display.title());
         String advancementDesc = PlainTextComponentSerializer.plainText().serialize(display.description());
