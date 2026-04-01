@@ -5,8 +5,13 @@ Paper 1.21.11 plugin that posts player events to Discord via webhooks.
 ## Build & Deploy
 
 ```bash
-./gradlew shadowJar
-cp build/libs/RzlDiscordBot-1.0.0.jar /path/to/paper-server/plugins/
+./gradlew shadowJar                # build only
+./gradlew deploy                   # build + copy to local server
+```
+
+Local deploy requires `deployDir` in `gradle.properties` (gitignored):
+```properties
+deployDir=../my-server/plugins
 ```
 
 Config is generated at `plugins/RzlDiscordBot/config.yml` on first server start. The webhook URL must be set there.

@@ -39,3 +39,15 @@ tasks.shadowJar {
 tasks.build {
     dependsOn(tasks.shadowJar)
 }
+
+tasks.register<Copy>("deploy") {
+    description = "Build and deploy the plugin jar to a local Paper server"
+    group = "distribution"
+
+    val dir = project.findProperty("deployDir") as String?
+        ?: throw GradleException("Set deployDir in gradle.properties (e.g. deployDir=../my-server/plugins)")
+
+    dependsOn(tasks.shadowJar)
+    from(tasks.shadowJar.flatMap { it.archiveFile })
+    into(dir)
+}
