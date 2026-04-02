@@ -9,7 +9,7 @@ A Paper plugin that posts Minecraft server events to a Discord channel via webho
 - **Player join/leave** — color-coded embeds (green/red) with player skin avatar
 - **Player death** — dark embed with the death cause message
 - **Player advancement** — gold embed when a player earns an advancement (recipe unlocks are filtered out)
-- All events are individually toggleable via config
+- All events are individually toggleable via config or in-game commands
 
 ## Requirements
 
@@ -62,6 +62,20 @@ colors:
 ```
 
 All messages appear from the configured bot identity. Each embed includes the player's Minecraft skin as a thumbnail.
+
+## Commands
+
+The `/rzldiscord` command lets operators manage event notifications in-game. Requires the `rzldiscordbot.admin` permission (defaults to op).
+
+| Command | Description |
+|---|---|
+| `/rzldiscord status` | Show which events are enabled or disabled |
+| `/rzldiscord toggle <event>` | Toggle a specific event on or off |
+| `/rzldiscord reload` | Reload configuration from disk |
+
+Event names for `toggle`: `join`, `leave`, `death`, `advancement`
+
+Changes made with `toggle` are saved to `config.yml` immediately and take effect without a server restart.
 
 ## Testing
 

@@ -1,7 +1,9 @@
 package com.rizzleworks.discordbot;
 
+import com.rizzleworks.discordbot.command.RzlDiscordCommand;
 import com.rizzleworks.discordbot.discord.DiscordWebhookSender;
 import com.rizzleworks.discordbot.listener.PlayerEventListener;
+import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.net.http.HttpClient;
@@ -13,6 +15,10 @@ public class RzlDiscordBotPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         saveDefaultConfig();
+
+        var rzlCommand = new RzlDiscordCommand(this);
+        getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS,
+                event -> rzlCommand.register(event.registrar()));
 
         String webhookUrl = getConfig().getString("webhook-url", "");
         if (webhookUrl == null || webhookUrl.isBlank()) {
@@ -26,7 +32,7 @@ public class RzlDiscordBotPlugin extends JavaPlugin {
         String botIconUrl = getConfig().getString("bot-icon-url", "");
 
         var webhookSender = new DiscordWebhookSender(httpClient, webhookUrl, botName, botIconUrl, getLogger());
-        var listener = new PlayerEventListener(this, webhookSender, getConfig());
+        var listener = new PlayerEventListener(this, webhookSender);
 
         getServer().getPluginManager().registerEvents(listener, this);
         getLogger().info("RzlDiscordBot enabled — posting events to Discord.");

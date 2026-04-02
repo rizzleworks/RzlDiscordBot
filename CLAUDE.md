@@ -24,7 +24,8 @@ Single Paper plugin, no external services or runtime dependencies beyond the JDK
 - **Async HTTP**: `java.net.http.HttpClient.sendAsync()` — never block the main server thread.
 - **JSON**: Built manually with string formatting. No Gson/Jackson.
 - **Player skin avatars**: `https://mc-heads.net/avatar/{uuid}/64` — passed as `avatar_url` and embed thumbnail.
-- **Event toggles and embed colors**: Configurable in `config.yml`.
+- **Event toggles and embed colors**: Configurable in `config.yml` or via `/rzldiscord` in-game commands (op-only).
+- **NotificationEvent enum**: Centralizes event short names, config keys, and default colors. Used by both the command handler and event listener.
 
 ## Key Technical Constraints
 
@@ -41,4 +42,4 @@ Single Paper plugin, no external services or runtime dependencies beyond the JDK
 ./gradlew test
 ```
 
-JUnit 5 + Mockito. Tests cover the `discord` package: `JsonUtil`, `Embed`, `WebhookPayload` (pure unit tests), and `DiscordWebhookSender` (mocked `HttpClient`). Event listeners are not yet tested (would need MockBukkit).
+JUnit 5 + Mockito. Tests cover the `discord` package: `JsonUtil`, `Embed`, `WebhookPayload` (pure unit tests), `DiscordWebhookSender` (mocked `HttpClient`), and `PlayerEventListenerDeathTest` (mocked `Plugin` and `FileConfiguration`).
