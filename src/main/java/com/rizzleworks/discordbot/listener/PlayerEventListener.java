@@ -14,15 +14,23 @@ import org.bukkit.plugin.Plugin;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class PlayerEventListener implements Listener {
 
     private final Plugin plugin;
     private final DiscordWebhookSender webhookSender;
+    private final Map<UUID, Integer> sessionJoinTicks = new ConcurrentHashMap<>();
 
     public PlayerEventListener(Plugin plugin, DiscordWebhookSender webhookSender) {
         this.plugin = plugin;
         this.webhookSender = webhookSender;
+    }
+
+    void trackSessionJoin(UUID playerId, int ticks) {
+        sessionJoinTicks.put(playerId, ticks);
     }
 
     @EventHandler
@@ -38,6 +46,8 @@ public class PlayerEventListener implements Listener {
         // immediately during PlayerJoinEvent because player data isn't fully loaded yet.
         plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
             if (!player.isOnline()) return;
+
+            sessionJoinTicks.put(player.getUniqueId(), player.getStatistic(Statistic.PLAY_ONE_MINUTE));
 
             String firstPlayed = new SimpleDateFormat("MMM d, yyyy").format(new Date(player.getFirstPlayed()));
             int playTimeTicks = player.getStatistic(Statistic.PLAY_ONE_MINUTE);
@@ -57,13 +67,31 @@ public class PlayerEventListener implements Listener {
         var player = event.getPlayer();
         int color = plugin.getConfig().getInt(NotificationEvent.LEAVE.colorKey(), NotificationEvent.LEAVE.defaultColor());
 
+        int currentTicks = player.getStatistic(Statistic.PLAY_ONE_MINUTE);
+        int joinTicks = sessionJoinTicks.getOrDefault(player.getUniqueId(), currentTicks);
+        sessionJoinTicks.remove(player.getUniqueId());
+        String description = player.getName() + " played for " + formatSessionDuration(currentTicks - joinTicks);
+
         webhookSender.send(
                 player.getName(),
                 player.getUniqueId().toString(),
                 color,
                 player.getName() + " left the server",
-                null
+                description
         );
+    }
+
+    static String formatSessionDuration(int ticks) {
+        long totalMinutes = ticks / 1200L;
+        long hours = totalMinutes / 60;
+        long minutes = totalMinutes % 60;
+        if (hours > 0) {
+            return hours + "h " + minutes + "m";
+        } else if (minutes > 0) {
+            return minutes + "m";
+        } else {
+            return "<1m";
+        }
     }
 
     @EventHandler
