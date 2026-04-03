@@ -36,6 +36,18 @@ Single Paper plugin, no external services or runtime dependencies beyond the JDK
 - **Delayed join messages**: `onPlayerJoin` uses `runTaskLater(plugin, task, 20L)` (1-second delay) because `getFirstPlayed()` and `getStatistic(PLAY_ONE_MINUTE)` can return 0 if read immediately during `PlayerJoinEvent`. Always check `player.isOnline()` before sending — the player may disconnect during the delay.
 - **PLAY_ONE_MINUTE**: Despite the name, this Bukkit statistic counts **ticks**, not minutes. Divide by 1200 for minutes (20 ticks/sec × 60 sec).
 
+## Release
+
+Versioning is derived from git tags via `git describe`. No manual file edits needed — both `build.gradle.kts` and `paper-plugin.yml` get the version automatically.
+
+To create a release:
+```bash
+git tag v1.1.0
+git push origin v1.1.0
+```
+
+The `.github/workflows/release.yml` workflow builds the JAR, runs tests, and creates a GitHub Release with the JAR attached and auto-generated release notes.
+
 ## Testing
 
 ```bash
