@@ -5,7 +5,6 @@
 _(Well-defined features ready for development)_
 
 - **Testing**: need to test player death and achievement events, what do the embeds look like?
-- **Session duration on leave**: Show how long the player was online in the quit message. Track `PLAY_ONE_MINUTE` ticks at join in a `Map<UUID, Integer>`, subtract on quit.
 - **Readable Colors** Define colors in config file using standard RGB hex values, e.g. #FF0000
 - **Config validation**: as we ship refinements to the plugin that introduce new config fields, it would be good for users to know if new configuration options need to be added to their file. If there is a standard strategy for addressing this, it would be great.
 - **Custom Player Colors**: Discord messages use a custom color for each player
