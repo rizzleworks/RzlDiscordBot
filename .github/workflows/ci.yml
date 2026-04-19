@@ -9,6 +9,7 @@ on:
 permissions:
   contents: read
   checks: write
+  pull-requests: write
 
 jobs:
   test:
@@ -26,7 +27,7 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
-      - run: ./gradlew test --no-daemon
+      - run: ./gradlew test jacocoTestReport --no-daemon
 
       - uses: dorny/test-reporter@v1
         if: always()
@@ -34,5 +35,15 @@ jobs:
           name: Test Results
           path: '**/test-results/test/TEST-*.xml'
           reporter: java-junit
+
+      - uses: madrapps/jacoco-report@v1.7.1
+        if: github.event_name == 'pull_request'
+        with:
+          paths: ${{ github.workspace }}/build/reports/jacoco/test/jacocoTestReport.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          title: Code Coverage
+          min-coverage-overall: 0
+          min-coverage-changed-files: 0
+          update-comment: true
 
       - run: ./gradlew shadowJar --no-daemon
