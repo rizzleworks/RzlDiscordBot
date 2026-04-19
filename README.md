@@ -23,7 +23,21 @@ A Paper plugin that posts Minecraft server events to a Discord channel via webho
 ./gradlew shadowJar
 ```
 
-Produces `build/libs/RzlDiscordBot-1.0.0.jar`.
+Produces `build/libs/RzlDiscordBot-<version>.jar` (version is derived from the latest `git tag`).
+
+### First-time setup
+
+`gradle.properties` is gitignored. Create one at the repo root with:
+
+```properties
+org.gradle.jvmargs=--enable-native-access=ALL-UNNAMED
+```
+
+Optionally, to use `./gradlew deploy` to copy the built JAR to a local Paper server, also add:
+
+```properties
+deployDir=../path/to/your/server/plugins
+```
 
 ## Installation
 
