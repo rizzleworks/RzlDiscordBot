@@ -2,4 +2,6 @@ name: RzlDiscordBot
 version: '${version}'
 main: com.rizzleworks.discordbot.RzlDiscordBotPlugin
 description: Posts player events to Discord via webhooks
+author: cliffmeyers
+website: https://github.com/cliffmeyers/minecraft-discord-bot
 api-version: '1.21'
