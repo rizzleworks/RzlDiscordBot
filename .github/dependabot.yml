@@ -6,7 +6,7 @@ updates:
       interval: weekly
     open-pull-requests-limit: 5
     labels:
-      - dependencies
+      - chore
 
   - package-ecosystem: github-actions
     directory: /
@@ -14,4 +14,4 @@ updates:
       interval: weekly
     open-pull-requests-limit: 5
     labels:
-      - dependencies
+      - chore
