@@ -1,6 +1,7 @@
 # RzlDiscordBot
 
 ![CI](https://github.com/cliffmeyers/minecraft-discord-bot/actions/workflows/ci.yml/badge.svg)
+![Release](https://img.shields.io/github/v/release/cliffmeyers/minecraft-discord-bot)
 
 A Paper plugin that posts Minecraft server events to a Discord channel via webhooks. Player joins, leaves, deaths, and advancements show up as rich embeds with player skin avatars.
 

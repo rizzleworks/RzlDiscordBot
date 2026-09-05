@@ -11,14 +11,14 @@ bot-icon-url: ""
 
 # Toggle individual event types
 events:
-  player-join: true
-  player-leave: true
-  player-death: true
-  player-advancement: true
+    player-join: true
+    player-leave: true
+    player-death: true
+    player-advancement: true
 
 # Embed colors (decimal RGB values)
 colors:
-  join: 5763719       # Green (#57F287)
-  leave: 15548997     # Red (#ED4245)
-  death: 2303786      # Dark (#23272A)
-  advancement: 15844367  # Gold (#F1C40F)
+    join: 5763719       # Green (#57F287)
+    leave: 15548997     # Red (#ED4245)
+    death: 2303786      # Dark (#23272A)
+    advancement: 15844367  # Gold (#F1C40F)
