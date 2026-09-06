@@ -5,9 +5,21 @@ plugins {
 }
 
 group = "com.rizzleworks"
-version = providers.exec {
-    commandLine("git", "describe", "--tags", "--match", "v*", "--always")
-}.standardOutput.asText.map { it.trim().removePrefix("v") }.getOrElse("0.0.0-dev")
+
+val gitDescribe = providers.exec {
+    commandLine("git", "describe", "--tags", "--match", "v*")
+    isIgnoreExitValue = true
+}
+
+// handle scenario where .git not available (e.g. source download, tagless clone)
+// runCatching also handles missing git binaries
+version = runCatching {
+    if (gitDescribe.result.get().exitValue == 0) {
+        gitDescribe.standardOutput.asText.get().trim().removePrefix("v")
+    } else {
+        null
+    }
+}.getOrNull() ?: "0.0.0-dev"
 
 java {
     toolchain {
@@ -32,6 +44,10 @@ dependencies {
 }
 
 tasks.processResources {
+    // Without this the task stays up to date across a version change, baking a
+    // stale version into paper-plugin.yml.
+    inputs.property("version", project.version)
+
     filesMatching("paper-plugin.yml") {
         expand("version" to project.version)
     }
