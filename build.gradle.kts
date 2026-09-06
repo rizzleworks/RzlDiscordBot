@@ -44,12 +44,16 @@ dependencies {
 }
 
 tasks.processResources {
+    // Read at configuration time. Touching project inside filesMatching happens at
+    // execution time, which Gradle 10 rejects and the configuration cache forbids.
+    val pluginVersion = project.version.toString()
+
     // Without this the task stays up to date across a version change, baking a
     // stale version into paper-plugin.yml.
-    inputs.property("version", project.version)
+    inputs.property("version", pluginVersion)
 
     filesMatching("paper-plugin.yml") {
-        expand("version" to project.version)
+        expand("version" to pluginVersion)
     }
 }
 
