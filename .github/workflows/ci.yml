@@ -47,7 +47,7 @@ jobs:
 
             - run: ./gradlew shadowJar --no-daemon
 
-    build-from-export:
+    build:
         runs-on: ubuntu-latest
 
         steps:
