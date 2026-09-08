@@ -1,13 +1,25 @@
 plugins {
     java
     jacoco
-    id("com.gradleup.shadow") version "9.0.0-beta12"
+    id("com.gradleup.shadow") version "9.6.1"
 }
 
 group = "com.rizzleworks"
-version = providers.exec {
-    commandLine("git", "describe", "--tags", "--match", "v*", "--always")
-}.standardOutput.asText.map { it.trim().removePrefix("v") }.getOrElse("0.0.0-dev")
+
+val gitDescribe = providers.exec {
+    commandLine("git", "describe", "--tags", "--match", "v*")
+    isIgnoreExitValue = true
+}
+
+// handle scenario where .git not available (e.g. source download, tagless clone)
+// runCatching also handles missing git binaries
+version = runCatching {
+    if (gitDescribe.result.get().exitValue == 0) {
+        gitDescribe.standardOutput.asText.get().trim().removePrefix("v")
+    } else {
+        null
+    }
+}.getOrNull() ?: "0.0.0-dev"
 
 java {
     toolchain {
@@ -26,14 +38,22 @@ dependencies {
 
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.4")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    testImplementation("org.assertj:assertj-core:3.27.3")
+    testImplementation("org.assertj:assertj-core:3.27.7")
     testImplementation("org.mockito:mockito-core:5.23.0")
     testImplementation("org.mockito:mockito-junit-jupiter:5.23.0")
 }
 
 tasks.processResources {
+    // Read at configuration time. Touching project inside filesMatching happens at
+    // execution time, which Gradle 10 rejects and the configuration cache forbids.
+    val pluginVersion = project.version.toString()
+
+    // Without this the task stays up to date across a version change, baking a
+    // stale version into paper-plugin.yml.
+    inputs.property("version", pluginVersion)
+
     filesMatching("paper-plugin.yml") {
-        expand("version" to project.version)
+        expand("version" to pluginVersion)
     }
 }
 

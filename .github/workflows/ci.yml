@@ -1,49 +1,77 @@
 name: CI
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
 
+# A fork PR's token is read-only regardless of what is requested here, so the
+# reporting steps live in report.yml, which runs with a grantable token.
 permissions:
-  contents: read
-  checks: write
-  pull-requests: write
+    contents: read
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
+    test:
+        runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+              with:
+                  fetch-depth: 0
 
-      - uses: actions/setup-java@v4
-        with:
-          distribution: corretto
-          java-version: 21
+            - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+              with:
+                  distribution: corretto
+                  java-version: 21
 
-      - uses: gradle/actions/setup-gradle@v4
+            - uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6
 
-      - run: ./gradlew test jacocoTestReport --no-daemon
+            - run: ./gradlew test jacocoTestReport --no-daemon
 
-      - uses: dorny/test-reporter@v1
-        if: always()
-        with:
-          name: Test Results
-          path: '**/test-results/test/TEST-*.xml'
-          reporter: java-junit
+            # report.yml cannot resolve the PR number itself: workflow_run only
+            # populates pull_requests for same-repo PRs, and it is empty for forks.
+            - name: Record the PR number
+              if: github.event_name == 'pull_request'
+              run: echo "${{ github.event.number }}" > pr-number.txt
 
-      - uses: madrapps/jacoco-report@v1.7.1
-        if: github.event_name == 'pull_request'
-        with:
-          paths: ${{ github.workspace }}/build/reports/jacoco/test/jacocoTestReport.xml
-          token: ${{ secrets.GITHUB_TOKEN }}
-          title: Code Coverage
-          min-coverage-overall: 0
-          min-coverage-changed-files: 0
-          update-comment: true
+            - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+              if: ${{ !cancelled() }}
+              with:
+                  name: test-results
+                  path: |
+                      build/test-results/test/TEST-*.xml
+                      build/reports/jacoco/test/jacocoTestReport.xml
+                      pr-number.txt
+                  if-no-files-found: error
 
-      - run: ./gradlew shadowJar --no-daemon
+            - run: ./gradlew shadowJar --no-daemon
+
+    build:
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+            - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+              with:
+                  distribution: corretto
+                  java-version: 21
+
+            - uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6
+
+            # create a "gitless" environment for running the build
+            # ensures gradle has no hard dep on git
+            - name: Export the tree without .git
+              run: |
+                  mkdir -p "$RUNNER_TEMP/export"
+                  git archive HEAD | tar -x -C "$RUNNER_TEMP/export"
+
+            - name: Build from the export
+              working-directory: ${{ runner.temp }}/export
+              run: ./gradlew shadowJar --no-daemon
+
+            - name: Check the version fell back
+              working-directory: ${{ runner.temp }}/export
+              run: |
+                  unzip -p build/libs/*.jar paper-plugin.yml | grep -F "version: '0.0.0-dev'"
