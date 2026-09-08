@@ -1,0 +1,67 @@
+name: Report
+
+# Runs in the base repo after CI finishes, where the token can hold write scopes.
+# A fork PR's own run cannot be granted them.
+#
+# Nothing here checks out or executes PR code. It only reads artifacts, which is
+# what keeps a write-capable token safe to use on an untrusted contribution.
+on:
+    workflow_run:
+        workflows: [CI]
+        types: [completed]
+
+permissions: {}
+
+jobs:
+    test-report:
+        runs-on: ubuntu-latest
+
+        permissions:
+            actions: read
+            checks: write
+
+        steps:
+            - uses: dorny/test-reporter@v3
+              with:
+                  artifact: test-results
+                  name: Test Results
+                  path: '**/test-results/test/TEST-*.xml'
+                  reporter: java-junit
+
+    coverage-report:
+        runs-on: ubuntu-latest
+        if: github.event.workflow_run.event == 'pull_request'
+
+        permissions:
+            actions: read
+            pull-requests: write
+
+        steps:
+            - uses: actions/download-artifact@v8
+              with:
+                  name: test-results
+                  path: artifact
+                  run-id: ${{ github.event.workflow_run.id }}
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+
+            # The artifact is built from PR code, so treat the number as untrusted
+            # input and reject anything that is not a bare integer.
+            - name: Read the PR number
+              id: pr
+              run: |
+                  number=$(cat artifact/pr-number.txt)
+                  if ! printf '%s' "$number" | grep -Eq '^[0-9]+$'; then
+                      echo "Refusing malformed PR number: $number" >&2
+                      exit 1
+                  fi
+                  echo "number=$number" >> "$GITHUB_OUTPUT"
+
+            - uses: madrapps/jacoco-report@v1.8.0
+              with:
+                  paths: ${{ github.workspace }}/artifact/**/jacocoTestReport.xml
+                  token: ${{ secrets.GITHUB_TOKEN }}
+                  pr-number: ${{ steps.pr.outputs.number }}
+                  title: Code Coverage
+                  min-coverage-overall: 0
+                  min-coverage-changed-files: 0
+                  update-comment: true
