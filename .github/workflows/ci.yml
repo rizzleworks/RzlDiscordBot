@@ -6,6 +6,11 @@ on:
     pull_request:
         branches: [main]
 
+# Superseded PR runs are canceled but pushes to main are not
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 # A fork PR's token is read-only regardless of what is requested here, so the
 # reporting steps live in report.yml, which runs with a grantable token.
 permissions:
