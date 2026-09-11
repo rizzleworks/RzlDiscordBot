@@ -7,6 +7,6 @@ changelog:
         - title: 🧹 Maintenance
           labels: [chore, refactor]
         - title: 📖 Documentation
-          labels: [documentation]
+          labels: [docs]
     exclude:
         labels: [skip-changelog]

@@ -1,0 +1,40 @@
+name: PR labels
+
+# Every PR must declare its changelog intent with a label so merged PRs always
+# land in a release-notes category (see .github/release.yml). `skip-changelog`
+# is the escape hatch. Dependabot PRs pass automatically because
+# .github/dependabot.yml labels them `chore`.
+#
+# Make this check required in the branch ruleset so unlabelled PRs can't merge.
+on:
+    pull_request:
+        types: [opened, reopened, synchronize, labeled, unlabeled]
+
+permissions:
+    contents: read
+
+# Serialize but never cancel. A PR opened with a label fires `opened` and
+# `labeled` a second apart, and cancelling the first would leave a stray
+# "cancelled" check-run on the commit that a required-status gate reads as
+# unsatisfied. The check takes seconds, so queueing costs nothing.
+concurrency:
+    group: pr-labels-${{ github.event.pull_request.number }}
+    cancel-in-progress: false
+
+jobs:
+    require-changelog-label:
+        name: require a changelog label
+        runs-on: ubuntu-latest
+        steps:
+            # Runs, and fails, only when none of the allowed labels are present.
+            - name: Fail unless the PR has a changelog label
+              if: >-
+                  !contains(github.event.pull_request.labels.*.name, 'feature') &&
+                  !contains(github.event.pull_request.labels.*.name, 'bug') &&
+                  !contains(github.event.pull_request.labels.*.name, 'docs') &&
+                  !contains(github.event.pull_request.labels.*.name, 'chore') &&
+                  !contains(github.event.pull_request.labels.*.name, 'refactor') &&
+                  !contains(github.event.pull_request.labels.*.name, 'skip-changelog')
+              run: |
+                  echo "::error::This PR needs one of: feature, bug, docs, chore, refactor (or skip-changelog to opt out of release notes)."
+                  exit 1
