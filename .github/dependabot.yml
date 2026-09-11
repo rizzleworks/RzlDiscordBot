@@ -7,9 +7,8 @@ updates:
       open-pull-requests-limit: 5
       labels:
           - chore
-      # paper-api's version is the target Minecraft version, not a library
-      # version. Bump it by hand when the server moves.
       ignore:
+          # pinned to 1.12.x for compatibility
           - dependency-name: 'io.papermc.paper:*'
 
     - package-ecosystem: github-actions
