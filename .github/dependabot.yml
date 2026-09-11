@@ -7,6 +7,9 @@ updates:
       open-pull-requests-limit: 5
       labels:
           - chore
+      ignore:
+          # pinned to 1.12.x for compatibility
+          - dependency-name: 'io.papermc.paper:*'
 
     - package-ecosystem: github-actions
       directory: /
