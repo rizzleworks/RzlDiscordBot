@@ -4,9 +4,9 @@ changelog:
           labels: [feature]
         - title: 🐛 Bug Fixes
           labels: [bug]
-        - title: 🧹 Maintenance
-          labels: [chore, refactor]
         - title: 📖 Documentation
           labels: [docs]
+        - title: 🧹 Maintenance
+          labels: [chore, refactor]
     exclude:
-        labels: [skip-changelog]
+        labels: [unlisted]
