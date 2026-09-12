@@ -1,7 +1,7 @@
 # RzlDiscordBot
 
-![CI](https://github.com/cliffmeyers/minecraft-discord-bot/actions/workflows/ci.yml/badge.svg)
-![Release](https://img.shields.io/github/v/release/cliffmeyers/minecraft-discord-bot)
+![CI](https://github.com/rizzleworks/RzlDiscordBot/actions/workflows/ci.yml/badge.svg)
+![Release](https://img.shields.io/github/v/release/rizzleworks/RzlDiscordBot)
 
 A Paper plugin that posts Minecraft server events to a Discord channel via webhooks. Player joins, leaves, deaths, and advancements show up as rich embeds with player skin avatars.
 
@@ -20,7 +20,7 @@ A Paper plugin that posts Minecraft server events to a Discord channel via webho
 
 ## Installation
 
-1. Download the latest `RzlDiscordBot-<version>.jar` from the [Releases page](https://github.com/cliffmeyers/minecraft-discord-bot/releases).
+1. Download the latest `RzlDiscordBot-<version>.jar` from the [Releases page](https://github.com/rizzleworks/RzlDiscordBot/releases).
 2. Copy the JAR into your Paper server's `plugins/` directory.
 3. Start the server once. The plugin generates `plugins/RzlDiscordBot/config.yml` and logs a warning that no webhook URL is configured.
 4. Create a Discord webhook (see below) and paste the URL into `config.yml`.

@@ -1,13 +1,14 @@
 # Security Policy
 
-Just in case someone else downloads this.
+This policy applies to the RzlDiscordBot plugin itself. Vulnerabilities in
+Paper or in Discord belong to those projects.
 
 ## Reporting a Vulnerability
 
 Please do **not** open a public issue for security reports. Instead, use GitHub's
 private vulnerability reporting:
 
-1. Go to the [Security tab](https://github.com/cliffmeyers/minecraft-discord-bot/security) of this repository.
+1. Go to the [Security tab](https://github.com/rizzleworks/RzlDiscordBot/security) of this repository.
 2. Click **Report a vulnerability**.
 3. Fill out the form with reproduction steps and any relevant details.
 
