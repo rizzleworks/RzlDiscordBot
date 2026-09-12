@@ -27,6 +27,11 @@ java {
     }
 }
 
+// agent must be loaded explicitly as self-attaching will be disallowed
+val mockitoAgent = configurations.create("mockitoAgent") {
+    isTransitive = false
+}
+
 repositories {
     mavenCentral()
     maven("https://repo.papermc.io/repository/maven-public/")
@@ -41,6 +46,7 @@ dependencies {
     testImplementation("org.assertj:assertj-core:3.27.7")
     testImplementation("org.mockito:mockito-core:5.23.0")
     testImplementation("org.mockito:mockito-junit-jupiter:5.23.0")
+    mockitoAgent("org.mockito:mockito-core:5.23.0")
 }
 
 tasks.processResources {
@@ -60,6 +66,12 @@ tasks.processResources {
 tasks.test {
     useJUnitPlatform()
     finalizedBy(tasks.jacocoTestReport)
+    // Resolved through a provider so the path is computed at execution time,
+    // which keeps the configuration cache usable.
+    val agentJar = mockitoAgent.incoming.files
+    jvmArgumentProviders.add(CommandLineArgumentProvider {
+        listOf("-javaagent:${agentJar.singleFile.absolutePath}")
+    })
 }
 
 tasks.jacocoTestReport {
