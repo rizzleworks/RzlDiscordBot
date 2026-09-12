@@ -1,7 +1,7 @@
 name: PR labels
 
 # Every PR must declare its changelog intent with a label so merged PRs always
-# land in a release-notes category (see .github/release.yml). `skip-changelog`
+# land in a release-notes category (see .github/release.yml). `unlisted`
 # is the escape hatch. Dependabot PRs pass automatically because
 # .github/dependabot.yml labels them `chore`.
 #
@@ -34,7 +34,7 @@ jobs:
                   !contains(github.event.pull_request.labels.*.name, 'docs') &&
                   !contains(github.event.pull_request.labels.*.name, 'chore') &&
                   !contains(github.event.pull_request.labels.*.name, 'refactor') &&
-                  !contains(github.event.pull_request.labels.*.name, 'skip-changelog')
+                  !contains(github.event.pull_request.labels.*.name, 'unlisted')
               run: |
-                  echo "::error::This PR needs one of: feature, bug, docs, chore, refactor (or skip-changelog to opt out of release notes)."
+                  echo "::error::This PR needs one of: feature, bug, docs, chore, refactor (or unlisted to opt out of release notes)."
                   exit 1

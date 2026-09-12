@@ -138,7 +138,7 @@ the need.
 
 Confirm the Dependabot `chore` label and the labels referenced in
 `.github/release.yml` (`feature`, `bug`, `chore`, `refactor`, `documentation`,
-`skip-changelog`) all exist in the destination repo, since labels do not survive
+`unlisted`) all exist in the destination repo, since labels do not survive
 a transfer cleanly.
 
 ### 10. Transfer and rename mechanics
