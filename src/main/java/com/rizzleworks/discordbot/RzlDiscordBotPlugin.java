@@ -20,6 +20,11 @@ public class RzlDiscordBotPlugin extends JavaPlugin {
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS,
                 event -> rzlCommand.register(event.registrar()));
 
+        startWebhook();
+    }
+
+    // Split out of onEnable for testability
+    void startWebhook() {
         String webhookUrl = getConfig().getString("webhook-url", "");
         if (webhookUrl == null || webhookUrl.isBlank()) {
             getLogger().warning("No webhook URL configured! Set 'webhook-url' in plugins/RzlDiscordBot/config.yml");

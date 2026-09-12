@@ -14,6 +14,7 @@ closer of the two to release ready:
 - MIT `LICENSE` and a `SECURITY.md` are present
 - Repo is `cliffmeyers/minecraft-discord-bot`, currently private, default branch `main`
 
+<<<<<<< HEAD
 ### 1. Build fails outside a git checkout
 
 The only item here that is actually broken rather than unpolished.
@@ -82,32 +83,62 @@ queue. Note that #16 changes the release workflow, so re-verify a release after
 merging it.
 
 ### 5. Coverage gaps on user-facing code
+||||||| parent of af22068 (add tests to cover RzlDiscordBotPlugin and RzlDiscordCommand)
+### 1. Coverage gaps on user-facing code
+=======
+### 1. Coverage gap in the event listener
+>>>>>>> af22068 (add tests to cover RzlDiscordBotPlugin and RzlDiscordCommand)
 
-Overall 56% instruction coverage. Per class:
+`PlayerEventListener` is the only real coverage gap left. Mockito reaches the death and
+quit paths but not much else, because the join and advancement handlers need
+scheduler and advancement objects that are awkward to fake by hand. MockBukkit,
+recorded under "Much Later" below, is the natural way to close it.
 
-| Class | Coverage |
-|---|---|
-| `WebhookPayload` | 100% (103/103) |
-| `Embed` | 100% (85/85) |
-| `JsonUtil` | 100% (21/21) |
-| `DiscordWebhookSender` | 99% (127/128) |
-| `NotificationEvent` | 93% (86/92) |
-| `PlayerEventListener` | 54% (187/341) |
-| `RzlDiscordBotPlugin` | **0% (0/96)** |
-| `RzlDiscordCommand` | **0% (0/207)** |
+The 25 uncovered instructions in `RzlDiscordBotPlugin` are the command lifecycle
+registration in `onEnable`. `LifecycleEvents.COMMANDS` initializes through a
+`ServiceLoader` lookup that throws outside a running server, and the provider
+interface is package-private, so there is no clean way to fake it. Those lines
+have no branches; leave them.
 
+<<<<<<< HEAD
 `RzlDiscordCommand` is the largest untested class and is exactly what server
 operators interact with. `RzlDiscordBotPlugin` covers config loading and startup,
 including the missing-webhook warning path documented in the README.
 
 The MockBukkit idea already recorded under "Much Later" below is the natural way
 to close the `PlayerEventListener` gap.
+||||||| parent of af22068 (add tests to cover RzlDiscordBotPlugin and RzlDiscordCommand)
+`RzlDiscordCommand` is the largest untested class and is exactly what server
+operators interact with. `RzlDiscordBotPlugin` covers config loading and startup,
+including the missing-webhook warning path documented in the README.
+
+The MockBukkit idea under "Much Later" below is the natural way to close the
+`PlayerEventListener` gap. There is also an unmerged local branch,
+`test/test-containers`, holding a `PLAN_TESTCONTAINERS.md` worth reading before
+starting.
+=======
+Testcontainers was considered and deferred. It boots a real Paper server in Docker,
+which  catches load failures Mockito cannot, but records no JaCoCo coverage because the
+plugin runs in another JVM. If it ever gets built, it belongs in the release
+workflow rather than CI.
+>>>>>>> af22068 (add tests to cover RzlDiscordBotPlugin and RzlDiscordCommand)
 
 ### 6. The coverage gate is decorative
 
+<<<<<<< HEAD
 `.github/workflows/ci.yml` sets `min-coverage-overall: 0` and
 `min-coverage-changed-files: 0`, so the JaCoCo report can never fail a build.
 Set a real floor once item 5 has moved the number up.
+||||||| parent of af22068 (add tests to cover RzlDiscordBotPlugin and RzlDiscordCommand)
+`.github/workflows/report.yml` now sets `min-coverage-overall: 50` and
+`min-coverage-changed-files: 50`, just under the current 56%. Raise it as item 1
+closes.
+=======
+`.github/workflows/report.yml` sets `min-coverage-overall: 80`, just under the
+current 83%. `min-coverage-changed-files` stays at 50 because
+`PlayerEventListener` sits at 54%, so a stricter per-file bar would fail any pull
+request that touches it. Raise that one alongside item 1.
+>>>>>>> af22068 (add tests to cover RzlDiscordBotPlugin and RzlDiscordCommand)
 
 ### 7. Two shipped features have never been visually verified
 
