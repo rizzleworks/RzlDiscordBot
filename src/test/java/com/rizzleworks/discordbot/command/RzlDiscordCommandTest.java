@@ -26,9 +26,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class RzlDiscordCommandTest {
@@ -63,7 +61,9 @@ class RzlDiscordCommandTest {
         when(source.getSender()).thenReturn(sender);
         when(sender.hasPermission(RzlDiscordCommand.PERMISSION)).thenReturn(true);
 
-        assertThat(root.getRequirement().test(source)).isTrue();
+        assertThat(root.getRequirement().test(source))
+                .as("sender with %s should pass", RzlDiscordCommand.PERMISSION)
+                .isTrue();
     }
 
     @Test
@@ -71,7 +71,9 @@ class RzlDiscordCommandTest {
         when(source.getSender()).thenReturn(sender);
         when(sender.hasPermission(RzlDiscordCommand.PERMISSION)).thenReturn(false);
 
-        assertThat(root.getRequirement().test(source)).isFalse();
+        assertThat(root.getRequirement().test(source))
+                .as("sender without %s should be rejected", RzlDiscordCommand.PERMISSION)
+                .isFalse();
     }
 
     @Test
@@ -159,8 +161,9 @@ class RzlDiscordCommandTest {
 
     @Test
     void suggestsEveryEventName() throws Exception {
+        String typed = "rzldiscord toggle ";
         var suggestions = toggleArgument().getCustomSuggestions()
-                .getSuggestions(ctx, new SuggestionsBuilder("rzldiscord toggle ", 18))
+                .getSuggestions(ctx, new SuggestionsBuilder(typed, typed.length()))
                 .get();
 
         assertThat(suggestions.getList()).extracting(Suggestion::getText)
@@ -183,7 +186,7 @@ class RzlDiscordCommandTest {
 
     private List<String> messages() {
         ArgumentCaptor<Component> captor = ArgumentCaptor.captor();
-        verify(sender, org.mockito.Mockito.atLeastOnce()).sendMessage(captor.capture());
+        verify(sender, atLeastOnce()).sendMessage(captor.capture());
         return captor.getAllValues().stream()
                 .map(c -> PlainTextComponentSerializer.plainText().serialize(c))
                 .toList();
