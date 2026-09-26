@@ -5,7 +5,7 @@ name: PR labels
 # is the escape hatch. Dependabot PRs pass automatically because
 # .github/dependabot.yml labels them `chore`.
 #
-# Make this check required in the branch ruleset so unlabelled PRs can't merge.
+# Make both checks required in the branch ruleset so unlabelled PRs can't merge.
 on:
     pull_request:
         types: [opened, reopened, synchronize, labeled, unlabeled]
@@ -15,7 +15,7 @@ permissions:
 
 # Serialize but never cancel. A PR opened with a label fires `opened` and
 # `labeled` a second apart, and cancelling the first would leave a stray
-# "cancelled" check-run on the commit that a required-status gate reads as
+# "canceled" check-run on the commit that a required-status gate reads as
 # unsatisfied. The check takes seconds, so queueing costs nothing.
 concurrency:
     group: pr-labels-${{ github.event.pull_request.number }}
@@ -37,4 +37,18 @@ jobs:
                   !contains(github.event.pull_request.labels.*.name, 'unlisted')
               run: |
                   echo "::error::This PR needs one of: feature, bug, docs, chore, refactor (or unlisted to opt out of release notes)."
+                  exit 1
+
+    # Squash merges use the PR description as the commit body, so `described`
+    # confirms it was edited to read well on main.
+    require-described-label:
+        name: require the described label
+        runs-on: ubuntu-latest
+        steps:
+            - name: Fail unless the PR has the described label
+              if: >-
+                  github.event.pull_request.user.login != 'dependabot[bot]' &&
+                  !contains(github.event.pull_request.labels.*.name, 'described')
+              run: |
+                  echo "::error::Edit the PR description into the squash commit message you want on main, then add the described label."
                   exit 1
