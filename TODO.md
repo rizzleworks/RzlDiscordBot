@@ -51,6 +51,9 @@ _(Well-defined features ready for development)_
 - **Database?**: what options do we have for persisting state beyond config files?
 - **Throttling Strategy**: ensure that repeated joins and quits from the same player don't spam the server.
 - **CI Discord notifications**: GitHub Actions workflow that posts to the Discord webhook when a PR is merged (PR title, author, link). Use `curl` + the same webhook URL stored as a repo secret.
+- **Event listener tests**: `PlayerEventListener` sits at 54% and blocks raising `min-coverage-changed-files` above 50%. Deferred past `v0.1.0`.
+  - Planned route is MockBukkit (`com.github.seeseemelk:MockBukkit-v1.21:3.133.2` on Maven Central) with mock players and events. Check first whether it supports Paper's Brigadier lifecycle command registration, which `RzlDiscordCommand` uses.
+  - Testcontainers was rejected: it records no JaCoCo coverage, since the plugin runs in another JVM. Its plan (`PLAN_TESTCONTAINERS.md` on the local-only branch `test/test-containers`) pins Testcontainers `2.0.4`, which does not exist (latest is `1.21.3`), and sets the server to `1.21.1` instead of `1.21.11`. If it is ever built, it belongs in `release.yml`, not CI.
 
 ## Much Later
 
@@ -58,4 +61,3 @@ _(Ideas and exploration — not yet fully scoped)_
 
 - **Custom player messages**: custom text when a player joins or leaves
 - **Custom Bukkit event support**: Allow config-driven listeners for arbitrary Bukkit events from other plugins (e.g., land claims, economy transactions). Design: map event class names to webhook message templates.
-- **Event listener tests**: Add MockBukkit to test `PlayerEventListener` with mock players and events
