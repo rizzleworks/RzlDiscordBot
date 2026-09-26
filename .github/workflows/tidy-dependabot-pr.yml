@@ -1,7 +1,7 @@
 name: Tidy Dependabot PR
 
 # Squash merges use the PR body as the commit message and Dependabot's body is
-# a mess of HTML. This trims to a summary and moves details into a comment
+# a mess of HTML. This trims to a compare link and moves details into a comment
 on:
     pull_request:
         # synchronize re-tidies after `@dependabot recreate`, which restores the body.
@@ -36,21 +36,39 @@ jobs:
               id: build
               shell: python
               run: |
-                  import os, re
+                  import os, re, subprocess
 
                   MARKER = "<!-- tidy-dependabot-pr -->"
                   HEADER = (
                       "Dependabot's original description, moved out of the PR body so it "
                       "doesn't end up in the squash commit message."
                   )
+                  SHA = r"[0-9a-f]{40}"
+
+                  def resolve(repo, tag):
+                      r = subprocess.run(["gh", "api", f"repos/{repo}/commits/{tag}", "--jq", ".sha"],
+                                         capture_output=True, text=True)
+                      return r.stdout.strip() if r.returncode == 0 else None
+
+                  # SHA-pinned actions get a SHA range. Swap in tags only if both resolve to those exact commits.
+                  def tag_compare(url, first):
+                      m = re.fullmatch(rf"(https://github\.com/([^/]+/[^/]+)/compare/)({SHA})\.\.\.({SHA})", url)
+                      v = re.search(r" from (\S+) to (\S+?)\.?$", first)
+                      if not (m and v):
+                          return None
+                      tags = []
+                      for version, sha in ((v.group(1), m.group(3)), (v.group(2), m.group(4))):
+                          tag = next((t for t in (f"v{version}", version) if resolve(m.group(2), t) == sha), None)
+                          if not tag:
+                              return None
+                          tags.append(tag)
+                      return f"{m.group(1)}{tags[0]}...{tags[1]}"
 
                   body = open("body.md", encoding="utf-8").read().replace("\r\n", "\n")
                   tidy = "<details>" in body
 
                   if tidy:
                       first = body.split("\n", 1)[0].strip()
-                      # GitHub doesn't render markdown links in commit messages.
-                      summary = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", first)
 
                       # Dependabot's own full-range link. Quoted release notes carry their own
                       # compare links for narrower ranges, so the first URL found can be wrong.
@@ -59,9 +77,12 @@ jobs:
                       if first.startswith("Bumps ["):
                           m = re.search(r'href="(https://github\.com/[^"]+/compare/[^"]+)">compare view</a>', body)
                           compare = m.group(1) if m else None
+                      if compare:
+                          compare = tag_compare(compare, first) or compare
 
+                      # The commit subject already names the bump, so the body is just the link.
                       with open("summary.md", "w", encoding="utf-8") as f:
-                          f.write(summary + (f"\n\n{compare}" if compare else ""))
+                          f.write(compare or "")
 
                       # Everything below the --- is Dependabot's command list. Re-posting
                       # it could let the bot read those lines as commands.
