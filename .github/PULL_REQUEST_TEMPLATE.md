@@ -1,6 +1,7 @@
-## What this changes
-
-<!-- One or two sentences. Link the issue if there is one: Fixes #123 -->
+<!--
+    Write several clear sentences, avoid AI-generated slop.
+    Link the issue if there is one, e.g. Fixes #123
+-->
 
 ## Checklist
 
