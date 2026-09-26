@@ -37,8 +37,8 @@ warning until a webhook URL is set.
 
 JUnit 5 with Mockito and AssertJ. Please add tests with your change.
 
-Coverage is reported on every pull request and currently has a floor of 50%,
-both overall and on changed files. The floor moves up as coverage improves, so
+Coverage is reported on every pull request and currently has a floor of 80%
+overall and 50% on changed files. The floors move up as coverage improves, so
 new code that is hard to test may need a design change rather than an exemption.
 
 Mockito is loaded as a `-javaagent` rather than self-attaching. If you run tests
